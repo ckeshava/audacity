@@ -106,9 +106,9 @@ jobs:
       shell: bash
       run: |
         APP_BIN=$(find "$(pwd)/build.release/src/app/" -type f -name "audacity4portable*" -print -quit)
-        ARCH=x86-64
+        GENERATE_ARCHS=("x86_64 arm64")
         sudo cmake -DAPP_BIN=${APP_BIN} \
-                   -DARCH=${ARCH} \
+                   -DGENERATE_ARCHS="${GENERATE_ARCHS}" \
                    -DSENTRY_URL=https://sentry.audacityteam.org \
                    -DSENTRY_ORG=sentry \
                    -DSENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
