@@ -8,7 +8,7 @@ set(INSTALL_DIR "build.install")
 
 # Options
 set(BUILD_MODE "" CACHE STRING "Build mode")
-set(BUILD_VERSION "" CACHE STRING "Build mode")
+set(BUILD_VERSION "" CACHE STRING "Build version")
 
 if (NOT BUILD_MODE)
     file (STRINGS "${ARTIFACTS_DIR}/env/build_mode.env" BUILD_MODE)

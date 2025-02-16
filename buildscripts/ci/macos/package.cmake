@@ -8,7 +8,7 @@ set(PACKAGING_DIR ${CMAKE_CURRENT_LIST_DIR}/../../packaging/MacOS)
 
 # Options
 set(BUILD_MODE "" CACHE STRING "Build mode")
-set(BUILD_VERSION "" CACHE STRING "Build mode")
+set(BUILD_VERSION "" CACHE STRING "Build version")
 set(SIGN_CERTIFICATE_ENCRYPT_SECRET "" CACHE STRING "Sign cert encrypt secret")
 set(SIGN_CERTIFICATE_PASSWORD "" CACHE STRING "Sign cert pass")
 
@@ -17,8 +17,7 @@ if (NOT BUILD_MODE)
 endif()
 
 if (NOT BUILD_VERSION)
-    set(BUILD_VERSION 4.0.0.1234) # TODO
-    #file (STRINGS "${ARTIFACTS_DIR}/env/build_version.env" BUILD_VERSION)
+    file (STRINGS "${ARTIFACTS_DIR}/env/build_version.env" BUILD_VERSION)
 endif()
 
 if (NOT SIGN_CERTIFICATE_ENCRYPT_SECRET)
