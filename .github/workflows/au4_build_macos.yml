@@ -22,7 +22,6 @@ on:
 
 env:
   CI_DIR: buildscripts/ci
-  # Keshava: Why is the below ENV variable required?
   DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
 
 jobs:
