@@ -1,7 +1,13 @@
+# **********************************************************************
+#
+#  Audacity: A Digital Audio Editor
+#
+# **********************************************************************
 
-message(STATUS "Build MacOS")
+message(STATUS "Build Unit Tests for MacOS")
 
 # Config
+set(BUILD_TOOLS "$ENV{HOME}/build_tools")
 set(ARTIFACTS_DIR "build.artifacts")
 set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/../../..)
 
@@ -9,8 +15,7 @@ set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/../../..)
 set(BUILD_NUMBER "" CACHE STRING "Build number")
 set(BUILD_MODE "" CACHE STRING "Build mode")
 set(BUILD_REVISION "" CACHE STRING "Build revision")
-set(CRASH_REPORT_URL "" CACHE STRING "Crash report url")
-set(VST3_SDK_PATH "" CACHE STRING "Vst3 SDK path")
+set(BUILD_ENABLE_CODE_COVERAGE "" CACHE STRING "Build with code coverage")
 
 if (NOT BUILD_NUMBER)
     file (STRINGS "${ARTIFACTS_DIR}/env/build_number.env" BUILD_NUMBER)
@@ -40,33 +45,31 @@ elseif(BUILD_MODE STREQUAL "stable_build")
     set(APP_SUFFIX "")
 endif()
 
-
-set(BUILD_VST ON)
-if (NOT VST3_SDK_PATH)
-    message(WARNING "not set VST3_SDK_PATH, build VST module disabled")
-    set(BUILD_VST OFF)
+if (BUILD_ENABLE_CODE_COVERAGE STREQUAL "true")
+    set(BUILD_ENABLE_CODE_COVERAGE ON)
+    set(BUILD_USE_UNITY OFF)
+else()
+    set(BUILD_ENABLE_CODE_COVERAGE OFF)
+    set(BUILD_USE_UNITY OFF) # enable it after fixing the problem with unity
 endif()
 
-# Build
+# Build 
 set(CONFIG
-    -DBUILD_TYPE=release_install
+    -DBUILD_TYPE=DEBUG_INSTALL
+    -DBUILD_CONFIGURATION=UTEST
     -DBUILD_MODE=${APP_BUILD_MODE}
     -DBUILD_NUMBER=${BUILD_NUMBER}
     -DBUILD_REVISION=${BUILD_REVISION}
-    -DINSTALL_SUFFIX=${APP_SUFFIX}
+    -DBUILD_ENABLE_CODE_COVERAGE=${BUILD_ENABLE_CODE_COVERAGE}
+    -DBUILD_USE_UNITY=${BUILD_USE_UNITY}
 )
-
-#$CRASH_REPORT_URL
-#$BUILD_VST
-#$VST3_SDK_PATH
 
 execute_process(
     COMMAND cmake ${CONFIG} -P ${ROOT_DIR}/ci_build.cmake
     RESULT_VARIABLE BUILD_RESULT
 )
 
-if (BUILD_RESULT GREATER 0)
-    message(FATAL_ERROR "Failed build or install")
-else()
-    message(STATUS "Success build and install")
+if (BUILD_RESULT GREATER 0) 
+    message(FATAL_ERROR "Failed to build unit tests on MacOS")
 endif()
+
