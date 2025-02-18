@@ -101,17 +101,17 @@ jobs:
   run_utests_macos:
     runs-on: macos-13
     steps:
-    # - name: Cancel Previous Runs
-    #   uses: styfle/cancel-workflow-action@0.12.1
-    #   with:
-    #     access_token: ${{ github.token }}
+    - name: Cancel Previous Runs
+      uses: styfle/cancel-workflow-action@0.12.1
+      with:
+        access_token: ${{ github.token }}
 
     - name: Clone repository
       uses: actions/checkout@v4
 
     - name: "Configure workflow"
       run: |
-        # echo "CCACHE_TIMESTAMP=$(date -u +"%F-%T")" | tee -a $GITHUB_ENV
+        echo "CCACHE_TIMESTAMP=$(date -u +"%F-%T")" | tee -a $GITHUB_ENV
 
         ADD_INFO="_${GITHUB_REF#refs/heads/}"
         cmake -DEVENT=${{ github.event_name }} \
@@ -119,22 +119,22 @@ jobs:
               -DARTIFACT_INFO="Mac_${ADD_INFO}" \
               -P ${CI_DIR}/common/ci_configure.cmake 
 
-    # - name: Restore ccache files
-    #   uses: actions/cache@v4
-    #   with:
-    #     path: ${{ github.workspace }}/.ccache
-    #     key: ${{github.workflow}}-ccache-${{ env.CCACHE_TIMESTAMP }}
-    #     restore-keys: ${{github.workflow}}-ccache-
+    - name: Restore ccache files
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/.ccache
+        key: ${{github.workflow}}-ccache-${{ env.CCACHE_TIMESTAMP }}
+        restore-keys: ${{github.workflow}}-ccache-
 
-    # - name: Setup ccache
-    #   run: |
-    #     sudo apt-get update && sudo apt-get install -y ccache
-    #     cmake -P ${CI_DIR}/tools/setup_ccache_config.cmake
+    - name: Setup ccache
+      run: |
+        brew install ccache
+        cmake -P ${CI_DIR}/tools/setup_ccache_config.cmake
 
-    # - name: Free up disk space
-    #   run: |
-    #     sudo docker system prune -a -f
-    #     sudo rm -rf /usr/local/lib/android
+    - name: Free up disk space
+      run: |
+        sudo docker system prune -a -f
+        sudo rm -rf /usr/local/lib/android
 
     - name: Setup environment
       run: |
@@ -177,7 +177,7 @@ jobs:
     #     lcov --capture --directory "$(pwd)/build.debug/" --output-file coverage.info
     #     lcov --remove coverage.info '/usr/*' '*/tests/*' '*/thirdparty/*' '*/moc_*' '*framework/Headers/*' '*/hb-*' '*/Qt/*' --output-file filtered_coverage.info
 
-    #     python3 buildscripts/ci/linux/tools/lcov_badger.py filtered_coverage.info coverage_badge.svg
+    #     python3 buildscripts/ci/macos/tools/lcov_badger.py filtered_coverage.info coverage_badge.svg
 
     #     S3_URL='s3://extensions.musescore.org/test/code_coverage/au_coverage_badge.svg'
 
