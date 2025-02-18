@@ -136,32 +136,23 @@ jobs:
         bash ${CI_DIR}/macos/setup.sh
 
     - name: Build
+      env:
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+        CODE_COVERAGE: ${{ inputs.code_coverage }}
       run: |
+        ENABLE_CODE_COVERAGE='false'
+
+        if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$CODE_COVERAGE" == "true" ]]; then
+          ENABLE_CODE_COVERAGE='true'
+        else
+          ENABLE_CODE_COVERAGE='false'
+        fi
+
         source $HOME/build_tools/environment.sh
-        cmake -P ${CI_DIR}/macos/ci_build_utests.cmake
+        cmake -DBUILD_ENABLE_CODE_COVERAGE=${ENABLE_CODE_COVERAGE} -P ${CI_DIR}/macos/ci_build_utests.cmake
 
         echo "============== ccache ==============="
         ccache -s
-
-    # - name: Build
-    #   env:
-    #     GITHUB_EVENT_NAME: ${{ github.event_name }}
-    #     CODE_COVERAGE: ${{ inputs.code_coverage }}
-    #   run: |
-
-    #     ENABLE_CODE_COVERAGE='false'
-
-    #     if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$CODE_COVERAGE" == "true" ]]; then
-    #       ENABLE_CODE_COVERAGE='true'
-    #     else
-    #       ENABLE_CODE_COVERAGE='false'
-    #     fi
-
-    #     source $HOME/build_tools/environment.sh
-    #     cmake -DBUILD_ENABLE_CODE_COVERAGE=${ENABLE_CODE_COVERAGE} -P ${CI_DIR}/macos/ci_build_utests.cmake
-
-        # echo "============== ccache ==============="
-        # ccache -s
 
     - name: Run tests
       run: |
@@ -169,11 +160,11 @@ jobs:
       env:
         ASAN_OPTIONS: "detect_leaks=0"
 
-    # - name: Code coverage
-    #   if: github.event_name == 'schedule' || inputs.code_coverage == 'true'
-    #   run: |
-    #     lcov --capture --directory "$(pwd)/build.debug/" --output-file coverage.info
-    #     lcov --remove coverage.info '/usr/*' '*/tests/*' '*/thirdparty/*' '*/moc_*' '*framework/Headers/*' '*/hb-*' '*/Qt/*' --output-file filtered_coverage.info
+    - name: Code coverage
+      if: github.event_name == 'schedule' || inputs.code_coverage == 'true'
+      run: |
+        lcov --capture --directory "$(pwd)/build.debug/" --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' '*/tests/*' '*/thirdparty/*' '*/moc_*' '*framework/Headers/*' '*/hb-*' '*/Qt/*' --output-file filtered_coverage.info
 
     #     python3 buildscripts/ci/macos/tools/lcov_badger.py filtered_coverage.info coverage_badge.svg
 

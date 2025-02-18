@@ -42,5 +42,8 @@ wget -q --show-progress -O vst_sdk.7z "https://s3.amazonaws.com/utils.musescore.
 7z x -y vst_sdk.7z -o"$BUILD_TOOLS/vst"
 echo "export VST3_SDK_PATH=$VST3_SDK_PATH" >> $ENV_FILE
 
+# lcov tool is required for development purposes only. 
+# It helps with pretty display of code coverage data.
+brew install lcov
 
 echo "Setup script done"
