@@ -140,6 +140,9 @@ jobs:
         source $HOME/build_tools/environment.sh
         cmake -P ${CI_DIR}/macos/ci_build_utests.cmake
 
+        echo "============== ccache ==============="
+        ccache -s
+
     # - name: Build
     #   env:
     #     GITHUB_EVENT_NAME: ${{ github.event_name }}
@@ -160,11 +163,11 @@ jobs:
         # echo "============== ccache ==============="
         # ccache -s
 
-    # - name: Run tests
-    #   run: |
-    #     cmake -P ${CI_DIR}/macos/ci_run_utests.cmake
-    #   env:
-    #     ASAN_OPTIONS: "detect_leaks=0"
+    - name: Run tests
+      run: |
+        cmake -P ${CI_DIR}/macos/ci_run_utests.cmake
+      env:
+        ASAN_OPTIONS: "detect_leaks=0"
 
     # - name: Code coverage
     #   if: github.event_name == 'schedule' || inputs.code_coverage == 'true'
